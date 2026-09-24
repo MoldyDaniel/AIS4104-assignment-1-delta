@@ -11,31 +11,50 @@
 namespace ais4104::rigid_motion {
 
 //TASK: 1d
-//REFERENCE:
+//ELSEWHERE: https://math.libretexts.org/Bookshelves/Applied_Mathematics/Mathematics_for_Game_Developers_(Burzynski)/04:_Matrices/4.06:_Rotation_Matrices_in_3-Dimensions
+// I found it first on math.libretexts and tried that first before looking in the book for it.
+//REFERENCE: Figure (3.8) page 72, MR pre-print 2019
 Eigen::Matrix3d rotate_x(double radians)
 {
-    return Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d x(3,3);
+    x <<    1,0,0,
+            0,std::cos(radians),-std::sin(radians),
+            0,std::sin(radians),std::cos(radians);
+    return x;
 }
 
 //TASK: 1e
-//REFERENCE: 
+//REFERENCE: Figure (3.8) page 72, MR pre-print 2019
 Eigen::Matrix3d rotate_y(double radians)
 {
-    return Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d y(3,3);
+    y <<    std::cos(radians),0,std::sin(radians),
+            0,1,0,
+            -std::sin(radians),0,std::cos(radians);
+    return y;
 }
 
 //TASK: 1f
-//REFERENCE:
+//REFERENCE: Figure (3.8) page 72, MR pre-print 2019
 Eigen::Matrix3d rotate_z(double radians)
 {
-    return Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d z(3,3);
+    z <<    std::cos(radians),-std::sin(radians),0,
+            std::sin(radians),std::cos(radians),0,
+            0,0,1;
+    return z;
 }
 
 //TASK: 1g
-//REFERENCE: 
+//REFERENCE: //REFERENCE: Equation (3.16) page 65, MR pre-print 2019
 Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x, const Eigen::Vector3d &y, const Eigen::Vector3d &z)
 {
-    return Eigen::Matrix3d::Zero();
+
+    Eigen::Matrix3d m(3,3);
+    m <<    x(0),y(0),z(0),
+            x(1),y(1),z(1),
+            x(2),y(2),z(2);
+    return m;
 }
 
 //TASK: 1h

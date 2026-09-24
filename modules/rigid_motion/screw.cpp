@@ -10,17 +10,27 @@
 namespace ais4104::rigid_motion {
 
 //TASK: 1b
-//REFERENCE:
+//ELSEWHERE:https://www.quantstart.com/articles/Eigen-Library-for-Matrix-Algebra-in-C/
+//REFERENCE: Equation (3.30) page 75, MR pre-print 2019
 Eigen::Matrix3d skew_symmetric(const Eigen::Vector3d &v)
 {
-    return Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d m(3,3);
+    m << 0,-v(2),v(1),
+            v(2),0,-v(0),
+           -v(1),v(0),0;
+    m = -m;
+    m.transposeInPlace();
+
+    return m;
 }
 
 //TASK: 1c
-//REFERENCE:
+//ELSEWHERE:https://www.quantstart.com/articles/Eigen-Library-for-Matrix-Algebra-in-C/
+//REFERENCE:REFERENCE: Equation (3.30) page 75, MR pre-print 2019
 Eigen::Vector3d from_skew_symmetric(const Eigen::Matrix3d &m)
 {
-    return Eigen::Vector3d::Zero();
+    Eigen::Vector3d v(-m(1,2),m(0,2),-m(0,1));
+    return v;
 }
 
 //TASK: 3b
