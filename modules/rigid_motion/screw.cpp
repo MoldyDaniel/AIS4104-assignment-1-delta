@@ -149,37 +149,39 @@ Eigen::Matrix3d matrix_exponential_so3(const Eigen::Vector3d &w, double theta_ra
 }
 
 //TASK: 3l
-//REFERENCE: Proposition (3.15) page 88, Equation (3.71) page 96, MR pre-print 2019
+//REFERENCE: Proposition (3.15) page 88, Equation (3.71) page 96, Equation (3.89) page 104, Equation (3.88) page 103, MR pre-print 2019
 Eigen::Matrix4d matrix_exponential_se3(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta_radians)
 {
+    double norm_w = w.norm();
+    double norm_v = v.norm();
     Eigen::Matrix3d W = skew_symmetric(w);
     Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
     Eigen::Matrix3d G_O = I*theta_radians + (1-std::cos(theta_radians))*W + (theta_radians-std::sin(theta_radians))*(W*W);
 
     const double tol = 1e-9;
-    double norm_w = w.norm();
-    double norm_v = v.norm();
 
     if (norm_w > 1-tol && norm_w < 1+tol)
     {
         Eigen::Matrix4d result;
-        result <<   std::exp(W)*theta_radians, G_O*v,
-                    0,1;
+        result <<   rotation_matrix_from_axis_angle(w, theta_radians), G_O*v,
+                    0,0,0,1;
         return result;
     }
-    else
+    if ((norm_w > 0-tol && norm_w < 0+tol) && (norm_v > 1-tol && norm_v < 1+tol))
     {
         Eigen::Matrix4d result;
         result <<   I, v*theta_radians,
                     0,1;
         return result;
     }
+    return Eigen::Matrix4d::Zero();
 }
 
 //TASK: 3m
 //REFERENCE:
 Eigen::Matrix4d matrix_exponential_screw(const Eigen::Vector6d &s, double theta_radians)
 {
+
     return Eigen::Matrix4d::Zero();
 }
 
