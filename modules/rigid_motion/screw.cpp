@@ -118,31 +118,62 @@ praxis::expected<Eigen::Vector6d, praxis::refusal> adjoint_map(const Eigen::Vect
 }
 
 //TASK: 3i
-//REFERENCE:
+//REFERENCE:  Equation (3.71) page 96, Equation (3.74) page 97, MR pre-print 2019
 Eigen::Matrix4d twist_matrix_from_angular_linear(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
 {
-    return Eigen::Matrix4d::Zero();
+    Eigen::Matrix3d W = skew_symmetric(w);
+    Eigen::Matrix4d result;
+    result <<   W, v,
+                0,0;
+    return result;
 }
 
 //TASK: 3j
-//REFERENCE:
+//REFERENCE: Figure (3.19) page 101, Equation (3.71) page 96, Equation (3.74) page 97, MR pre-print 2019
 Eigen::Matrix4d twist_matrix_from_twist(const Eigen::Vector6d &t)
 {
-    return Eigen::Matrix4d::Zero();
+    Eigen::Vector3d w(t(0),t(1),t(2));
+    Eigen::Vector3d v(t(3),t(4),t(5));
+    Eigen::Matrix3d W = skew_symmetric(w);
+    Eigen::Matrix4d result;
+    result <<   W, v,
+                0,0;
+    return result;
 }
 
 //TASK: 3k
-//REFERENCE:
+//REFERENCE: Definition (3.7) page 75, MR pre-print 2019
 Eigen::Matrix3d matrix_exponential_so3(const Eigen::Vector3d &w, double theta_radians)
 {
     return rotation_matrix_from_axis_angle(w,theta_radians);
 }
 
 //TASK: 3l
-//REFERENCE:
+//REFERENCE: Proposition (3.15) page 88, Equation (3.71) page 96, MR pre-print 2019
 Eigen::Matrix4d matrix_exponential_se3(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta_radians)
 {
-    return Eigen::Matrix4d::Zero();
+    Eigen::Matrix3d W = skew_symmetric(w);
+    Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d G_O = I*theta_radians + (1-std::cos(theta_radians))*W + (theta_radians-std::sin(theta_radians))*(W*W);
+
+    const double tol = 1e-9;
+    double norm_w = w.norm();
+    double norm_v = v.norm();
+
+    if (norm_w > 1-tol && norm_w < 1+tol)
+    {
+        Eigen::Matrix4d result;
+        result <<   std::exp(W)*theta_radians, G_O*v,
+                    0,1;
+        return result;
+    }
+    else
+    {
+        Eigen::Matrix4d result;
+        result <<   I, v*theta_radians,
+                    0,1;
+        return result;
+    }
 }
 
 //TASK: 3m
