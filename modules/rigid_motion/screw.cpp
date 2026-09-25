@@ -7,6 +7,8 @@
 #include <limits>
 #include <numbers>
 
+#include "../../cmake-build-debug/_deps/spdlog-src/include/spdlog/spdlog.h"
+
 namespace ais4104::rigid_motion {
 
 //TASK: 1b
@@ -178,18 +180,45 @@ Eigen::Matrix4d matrix_exponential_se3(const Eigen::Vector3d &w, const Eigen::Ve
 }
 
 //TASK: 3m
-//REFERENCE:
+//REFERENCE: Equation (3.89) page 104, Equation (3.88) page 103, MR pre-print 2019
 Eigen::Matrix4d matrix_exponential_screw(const Eigen::Vector6d &s, double theta_radians)
 {
+    Eigen::Vector3d w(s(0),s(1),s(2));
+    Eigen::Vector3d v(s(3),s(4),s(5));
+    double norm_w = w.norm();
+    double norm_v = v.norm();
+    Eigen::Matrix3d W = skew_symmetric(w);
+    Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d G_O = I*theta_radians + (1-std::cos(theta_radians))*W + (theta_radians-std::sin(theta_radians))*(W*W);
 
+    const double tol = 1e-9;
+
+    if (norm_w > 1-tol && norm_w < 1+tol)
+    {
+        Eigen::Matrix4d result;
+        result <<   rotation_matrix_from_axis_angle(w, theta_radians), G_O*v,
+                    0,0,0,1;
+        return result;
+    }
+    if ((norm_w > 0-tol && norm_w < 0+tol) && (norm_v > 1-tol && norm_v < 1+tol))
+    {
+        Eigen::Matrix4d result;
+        result <<   I, v*theta_radians,
+                    0,1;
+        return result;
+    }
     return Eigen::Matrix4d::Zero();
 }
 
 //TASK: 3n
-//REFERENCE:
+//REFERENCE: Equation (3.53) & (3.54) page 84, MR pre-print 2019
 praxis::expected<std::pair<Eigen::Vector3d, double>, praxis::refusal> matrix_logarithm_so3(const Eigen::Matrix3d &r)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    double theta_radians = std::asin((r(0,0)+r(1,1)+r(2,2)-1)/2);
+    Eigen::Matrix3d axis = ((r-r.transpose())/(2*std::sin(theta_radians)));
+    Eigen::Vector3d axisVector = from_skew_symmetric(axis);
+
+    return std::make_pair(axisVector, theta_radians);
 }
 
 //TASK: 3o
