@@ -116,38 +116,58 @@ Eigen::Vector3d euler_from_rotation_matrix(const Eigen::Matrix3d &r, praxis::axi
 }
 
 //TASK: 2b
-//REFERENCE: 
+//REFERENCE: Equation (3.62) page 87, MR pre-print 2019
 Eigen::Matrix3d rotation_matrix_from_transform(const Eigen::Matrix4d &tf)
 {
-    return Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d m(3,3);
+    m <<    tf(0,0),tf(0,1),tf(0,2),
+            tf(1,0),tf(1,1),tf(1,2),
+            tf(2,0),tf(2,1),tf(2,2);
+    return m;
 }
 
 //TASK: 2c
-//REFERENCE: 
+//REFERENCE: Equation (3.62) page 87, MR pre-print 2019
 Eigen::Matrix4d transformation_matrix_from_rotation_position(const Eigen::Matrix3d &r, const Eigen::Vector3d &p)
 {
-    return Eigen::Matrix4d::Zero();
+    Eigen::Matrix4d m(4,4);
+    m <<    r(0,0),r(0,1),r(0,2),p(0),
+            r(1,0),r(1,1),r(1,2),p(1),
+            r(2,0),r(2,1),r(2,2),p(2),
+            0,0,0,1;
+    return m;
 }
 
 //TASK: 2d
-//REFERENCE: 
+//REFERENCE: translation operator page 91, MR pre-print 2019
 Eigen::Matrix4d transformation_matrix_from_position(const Eigen::Vector3d &p)
 {
-    return Eigen::Matrix4d::Zero();
+    Eigen::Matrix4d m(4,4);
+    m <<    1,0,0,p(0),
+            0,1,0,p(1),
+            0,0,1,p(2),
+            0,0,0,1;
+
+    return m;
 }
 
 //TASK: 2e
-//REFERENCE: 
+//REFERENCE: ROT 4x4 matrix page 91, MR pre-print 2019
 Eigen::Matrix4d transformation_matrix_from_rotation(const Eigen::Matrix3d &r)
 {
-    return Eigen::Matrix4d::Zero();
+    Eigen::Matrix4d m(4,4);
+    m <<    r(0,0),r(0,1),r(0,2),0,
+            r(1,0),r(1,1),r(1,2),0,
+            r(2,0),r(2,1),r(2,2),0,
+            0,0,0,1;
+    return m;
 }
 
 //TASK: 2f
-//REFERENCE: 
+//REFERENCE: Equation (3.64) page 88, MR pre-print 2019
 Eigen::Matrix4d inverse(const Eigen::Matrix4d &tf)
 {
-    return Eigen::Matrix4d::Zero();
+    return tf.inverse();
 }
 
 }
