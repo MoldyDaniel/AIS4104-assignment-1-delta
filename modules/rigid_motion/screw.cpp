@@ -44,13 +44,26 @@ praxis::expected<Eigen::Vector6d, praxis::refusal> screw_axis_from_point_directi
 }
 
 //TASK: 3c
-//REFERENCE: Definition (3.24) page 102, MR pre-print 2019
+//ELSEWHERE: https://stackoverflow.com/questions/17333/how-do-you-compare-float-and-double-while-accounting-for-precision-loss
+//REFERENCE: Figure (3.19) Definition (3.24) page 101-102, MR pre-print 2019
 Eigen::Vector6d screw_axis_from_angular_linear(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
 {
-    double angular_velocity = w.norm();
-    Eigen::Vector6d result;
-    result << w(0), w(1),w(2), v(0),v(1),v(2);
-    return result/angular_velocity;
+    const double tol = 1e-9;
+    double norm_w = w.norm();
+    double norm_v = v.norm();
+
+    if (norm_w > tol)
+    {
+        Eigen::Vector6d result;
+        result << w/norm_w, v/norm_w;
+        return result;
+    }
+    else
+    {
+        Eigen::Vector6d result;
+        result << 0,0,0, v/norm_v;
+        return result;
+    }
 }
 
 //TASK: 3d
@@ -63,7 +76,7 @@ Eigen::Vector6d twist_from_angular_linear(const Eigen::Vector3d &w, const Eigen:
 }
 
 //TASK: 3e
-//REFERENCE:
+//REFERENCE: Figure (3.19) page 101, MR pre-print 2019
 praxis::expected<Eigen::Vector6d, praxis::refusal> twist_from_screw(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h, double angular_velocity)
 {
     Eigen::Vector3d w = s*angular_velocity;
@@ -74,24 +87,34 @@ praxis::expected<Eigen::Vector6d, praxis::refusal> twist_from_screw(const Eigen:
 }
 
 //TASK: 3f
-//REFERENCE:
+//REFERENCE: Definition (3.20) page 98, MR pre-print 2019
 praxis::expected<Eigen::Matrix6d, praxis::refusal> adjoint_matrix_from_rotation_position(const Eigen::Matrix3d &r, const Eigen::Vector3d &p)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    Eigen::Matrix6d result;
+    result <<   r, Eigen::Matrix3d::Zero(),
+                skew_symmetric(p)*r,r;
+    return result;
 }
 
 //TASK: 3g
-//REFERENCE:
+//REFERENCE: Equation (3.62) page 87, MR pre-print 2019
 praxis::expected<Eigen::Matrix6d, praxis::refusal> adjoint_matrix_from_transform(const Eigen::Matrix4d &tf)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    Eigen::Matrix3d r = rotation_matrix_from_transform(tf);
+    Eigen::Vector3d p(tf(0,3),tf(1,3),tf(2,3));
+
+    return adjoint_matrix_from_rotation_position(r,p);
 }
 
 //TASK: 3h
-//REFERENCE:
+//REFERENCE: Equation (3.62) page 87, Definition (3.20) page 98, MR pre-print 2019
 praxis::expected<Eigen::Vector6d, praxis::refusal> adjoint_map(const Eigen::Vector6d &t, const Eigen::Matrix4d &tf)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    Eigen::Matrix3d r = rotation_matrix_from_transform(tf);
+    Eigen::Vector3d p(tf(0,3),tf(1,3),tf(2,3));
+    Eigen::Matrix6d AdT = adjoint_matrix_from_rotation_position(r,p).value();
+    Eigen::Vector6d result = AdT*t;
+    return result;
 }
 
 //TASK: 3i
