@@ -34,31 +34,43 @@ Eigen::Vector3d from_skew_symmetric(const Eigen::Matrix3d &m)
 }
 
 //TASK: 3b
-//REFERENCE:
+//REFERENCE: Figure (3.19) page 101, MR pre-print 2019
 praxis::expected<Eigen::Vector6d, praxis::refusal> screw_axis_from_point_direction_pitch(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    Eigen::Vector3d v = -s.cross(q)+h*s;
+    Eigen::Vector6d result;
+    result << s(0), s(1),s(2), v(0),v(1),v(2);
+    return result;
 }
 
 //TASK: 3c
-//REFERENCE:
+//REFERENCE: Definition (3.24) page 102, MR pre-print 2019
 Eigen::Vector6d screw_axis_from_angular_linear(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
 {
-    return Eigen::Vector6d::Zero();
+    double angular_velocity = w.norm();
+    Eigen::Vector6d result;
+    result << w(0), w(1),w(2), v(0),v(1),v(2);
+    return result/angular_velocity;
 }
 
 //TASK: 3d
-//REFERENCE:
+//REFERENCE: Figure (3.19) page 101, MR pre-print 2019
 Eigen::Vector6d twist_from_angular_linear(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
 {
-    return Eigen::Vector6d::Zero();
+    Eigen::Vector6d result;
+    result << w(0), w(1),w(2), v(0),v(1),v(2);
+    return result;
 }
 
 //TASK: 3e
 //REFERENCE:
 praxis::expected<Eigen::Vector6d, praxis::refusal> twist_from_screw(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h, double angular_velocity)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    Eigen::Vector3d w = s*angular_velocity;
+    Eigen::Vector3d v = -w.cross(q)+h*w;
+    Eigen::Vector6d result;
+    result << w(0), w(1),w(2), v(0),v(1),v(2);
+    return result;
 }
 
 //TASK: 3f
@@ -100,7 +112,7 @@ Eigen::Matrix4d twist_matrix_from_twist(const Eigen::Vector6d &t)
 //REFERENCE:
 Eigen::Matrix3d matrix_exponential_so3(const Eigen::Vector3d &w, double theta_radians)
 {
-    return Eigen::Matrix3d::Zero();
+    return rotation_matrix_from_axis_angle(w,theta_radians);
 }
 
 //TASK: 3l
