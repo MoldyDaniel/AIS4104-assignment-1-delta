@@ -46,7 +46,7 @@ Eigen::Matrix3d rotate_z(double radians)
 }
 
 //TASK: 1g
-//REFERENCE: //REFERENCE: Equation (3.16) page 65, MR pre-print 2019
+//REFERENCE: Equation (3.16) page 65, MR pre-print 2019
 Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x, const Eigen::Vector3d &y, const Eigen::Vector3d &z)
 {
 
@@ -58,23 +58,35 @@ Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x, const 
 }
 
 //TASK: 1h
-//REFERENCE: 
+//REFERENCE: Equation (3.51) page 82, MR pre-print 2019
 Eigen::Matrix3d rotation_matrix_from_axis_angle(const Eigen::Vector3d &axis, double radians)
 {
-    return Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
+
+    Eigen::Matrix3d skew_matrix = skew_symmetric(axis);
+    Eigen::Matrix3d result = I + std::sin(radians)*skew_matrix + (1-std::cos(radians))*(skew_matrix*skew_matrix);
+
+    return result;
 }
 
 //TASK: 1i Implement the special cases for Euler ZYX and XYZ using rotate_x, rotate_y, and rotate_z
-//REFERENCE: 
+//REFERENCE:  Figure (B.1) page 577, MR pre-print 2019
 Eigen::Matrix3d rotation_matrix_from_euler(const Eigen::Vector3d &e, praxis::axis_order order)
 {
+    Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
     if(order == praxis::axis_order::zyx)
     {
-        return Eigen::Matrix3d::Zero();
+        Eigen::Matrix3d X = rotate_x(e(0));
+        Eigen::Matrix3d Y = rotate_y(e(1));
+        Eigen::Matrix3d Z = rotate_z(e(2));
+        return I*Z*Y*X;
     }
     else if(order == praxis::axis_order::xyz)
     {
-        return Eigen::Matrix3d::Zero();
+        Eigen::Matrix3d X = rotate_x(e(0));
+        Eigen::Matrix3d Y = rotate_y(e(1));
+        Eigen::Matrix3d Z = rotate_z(e(2));
+        return I*X*Y*Z;
     }
 
     const std::array<std::uint8_t, 3> axes = praxis::axis_indices(order);
@@ -84,12 +96,18 @@ Eigen::Matrix3d rotation_matrix_from_euler(const Eigen::Vector3d &e, praxis::axi
 }
 
 //TASK: 1j -- Implement the special case for calculating the Euler ZYX.
-//REFERENCE: 
+//REFERENCE:  Figure (B.1) page 578, MR pre-print 2019
 Eigen::Vector3d euler_from_rotation_matrix(const Eigen::Matrix3d &r, praxis::axis_order order)
 {
     if(order == praxis::axis_order::zyx)
     {
-        return Eigen::Vector3d::Zero();
+        double X = std::atan2(r(1,0),r(0,0));
+        double Y = std::atan2(-r(2,0),std::sqrt(r(0,0)*r(0,0)+r(1,0)*r(1,0)));
+        double Z = std::atan2(r(2,1),r(2,2));
+
+        Eigen::Vector3d v(X, Y, Z);
+
+        return v;
     }
 
     const std::array<std::uint8_t, 3> axes = praxis::axis_indices(order);
