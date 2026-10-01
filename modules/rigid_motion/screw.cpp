@@ -7,8 +7,6 @@
 #include <limits>
 #include <numbers>
 
-#include "../../cmake-build-debug/_deps/spdlog-src/include/spdlog/spdlog.h"
-
 namespace ais4104::rigid_motion {
 
 //TASK: 1b
