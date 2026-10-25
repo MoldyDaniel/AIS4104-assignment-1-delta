@@ -11,7 +11,23 @@ namespace ais4104::manipulator {
 praxis::expected<Eigen::Matrix4d, praxis::refusal> forward_kinematics(const praxis::rigid_motion::screw_ops &screw, const Eigen::Matrix4d &m,
                                                                       std::span<const Eigen::Vector6d> space_screws, const Eigen::VectorXd &theta)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    Eigen::Matrix4d T = Eigen::Matrix4d::Identity();
+
+    // Since its unknown how long it can be
+    const std::size_t n = space_screws.size();
+    for (std::size_t i = 0; i < n; ++i)
+    {
+        const Eigen::Matrix4d exp_i =
+            screw.matrix_exponential_screw(
+                space_screws[i],
+                // Compiler told me to use static cast however i dont know what it does.
+                theta(static_cast<Eigen::Index>(i)));
+
+        T = T * exp_i;
+    }
+
+    T = T * m;
+    return T;
 }
 
 //TASK: 2b
@@ -19,7 +35,18 @@ praxis::expected<Eigen::Matrix4d, praxis::refusal> forward_kinematics(const prax
 praxis::expected<std::vector<Eigen::Vector6d>, praxis::refusal> body_screws_from_space(const praxis::rigid_motion::screw_ops &screw, const praxis::rigid_motion::frame_ops &frames,
                                                                                        const Eigen::Matrix4d &m, std::span<const Eigen::Vector6d> space_screws)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    const Eigen::Matrix4d m_inv = m.inverse();
+
+    std::vector<Eigen::Vector6d> body_screws;
+    body_screws.reserve(space_screws.size());
+
+    for (std::size_t i = 0; i < space_screws.size(); ++i)
+    {
+        const auto B_i = screw.adjoint_map(space_screws[i], m_inv);
+        body_screws.push_back(B_i.value());
+    }
+
+    return body_screws;
 }
 
 //TASK: 2c

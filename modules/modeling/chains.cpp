@@ -60,9 +60,49 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::Vector6d>> hardcoded_kr6r900sixx_c
 
 //TASK: 1b
 //REFERENCE: Lynch & Park, Modern Robotics, Ch. 4.1.1.
+// Because of both of us were stuck on this problem me and Oliver worked together.
 std::pair<Eigen::Matrix4d, std::vector<Eigen::Vector6d>> hardcoded_lbr_med14_r820_chain(const praxis::rigid_motion::screw_ops &screw)
 {
-    return {Eigen::Matrix4d::Zero(), {}};
+    Eigen::Matrix4d M = Eigen::Matrix4d::Identity();
+
+    M(0, 3) = 0.0;
+    M(1, 3) = 0.0;
+    M(2, 3) = 1.3055;
+
+    std::vector<Eigen::Vector3d> q = {
+        {0.000, 0.000, 0.000},
+        {0.000, 0.000, 0.3595},
+        {0.000, 0.000, 0.000},
+        {0.000, 0.000, 0.7795},
+        {0.000, 0.000, 0.000},
+        {0.000, 0.000, 1.1795},
+        {0.000, 0.000, 1.306}
+    };
+
+    std::vector<Eigen::Vector3d> w = {
+        {0, 0, 1},
+        {0, 1, 0},
+        {0, 0, 1},
+        {0, -1, 0},
+        {0, 0, 1},
+        {0, 1, 0},
+        {0, 0, 1}
+    };
+
+    std::vector<Eigen::Vector6d> S;
+    S.reserve(7);
+
+    for (int i = 0; i < 7; ++i)
+    {
+        auto axis =
+            screw.screw_axis_from_point_direction_pitch(q[i], w[i], 0.0);
+
+        if (!axis)
+            return {Eigen::Matrix4d::Zero(), {}};
+        S.push_back(axis.value());
+    }
+
+    return {M, S};
 }
 
 //TASK: 3a
