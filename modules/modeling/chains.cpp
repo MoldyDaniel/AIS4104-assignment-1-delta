@@ -106,8 +106,21 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::Vector6d>> hardcoded_lbr_med14_r82
 }
 
 //TASK: 3a
+// With help from Oliver
+//REFERENCE: Modern Robotics, Chapter 3.3.1, Definition 3.13, p. 87.
 Eigen::Matrix4d hardcoded_kr6r900sixx_curved_rod_tool_offset(const praxis::rigid_motion::frame_ops &frames)
 {
+    Eigen::Matrix4d Tft = Eigen::Matrix4d::Identity();
+
+    Tft.block<3, 3>(0, 0) << 0, 0, 1,
+                          0, 1, 0,
+                         -1, 0, 0;
+
+    Tft(0, 3) =  0.082;
+    Tft(1, 3) =  0.000;
+    Tft(2, 3) =  0.132;
+
+    return Tft;
     return Eigen::Matrix4d::Zero();
 }
 
