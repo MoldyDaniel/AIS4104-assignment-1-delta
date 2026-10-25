@@ -54,7 +54,24 @@ praxis::expected<std::vector<Eigen::Vector6d>, praxis::refusal> body_screws_from
 praxis::expected<Eigen::Matrix4d, praxis::refusal> body_forward_kinematics(const praxis::rigid_motion::screw_ops &screw, const praxis::rigid_motion::frame_ops &frames,
                                                                            const Eigen::Matrix4d &m, std::span<const Eigen::Vector6d> space_screws, const Eigen::VectorXd &theta)
 {
-    return praxis::unexpected(praxis::refusal::not_implemented);
+    auto body_screws_result = body_screws_from_space(screw, frames, m, space_screws);
+
+    Eigen::Matrix4d T = m;
+
+    // Doesnt let you take the size of body_screws_result
+    const std::vector<Eigen::Vector6d> B = body_screws_result.value();
+    const std::size_t n = B.size();
+    for (std::size_t i = 0; i < n; ++i)
+    {
+        const Eigen::Matrix4d exp_i =
+            screw.matrix_exponential_screw(
+                B[i],
+                theta(static_cast<Eigen::Index>(i)));
+
+        T = T * exp_i;
+    }
+
+    return T;
 }
 
 }
