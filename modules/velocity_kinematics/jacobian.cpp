@@ -42,6 +42,7 @@ praxis::expected<praxis::manipulator::jacobian, praxis::refusal> space_jacobian(
 }
 
 //TASK: 4b
+// Got stuck here
 //REFERENCE: Lynch & Park, Modern Robotics, Ch. 5.1.2, eq. (5.18).
 praxis::expected<praxis::manipulator::jacobian, praxis::refusal> body_jacobian(const praxis::rigid_motion::screw_ops &screw, const praxis::rigid_motion::frame_ops &frames,
                                                                                const praxis::manipulator::forward_kinematics_ops &forward, const Eigen::Matrix4d &m,

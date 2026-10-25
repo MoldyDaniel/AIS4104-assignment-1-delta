@@ -106,7 +106,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::Vector6d>> hardcoded_lbr_med14_r82
 }
 
 //TASK: 3a
-// With help from Oliver
+// Worked together with Oliver and he helped me solve this.
 //REFERENCE: Modern Robotics, Chapter 3.3.1, Definition 3.13, p. 87.
 Eigen::Matrix4d hardcoded_kr6r900sixx_curved_rod_tool_offset(const praxis::rigid_motion::frame_ops &frames)
 {
