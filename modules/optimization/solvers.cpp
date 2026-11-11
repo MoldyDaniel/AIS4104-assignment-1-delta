@@ -11,7 +11,7 @@
 namespace ais4104::optimization {
 
 //TASK: T.1a
-//REFERENCE:
+//REFERENCE: Algorithm in section 6.2.2 page 228, MR pre-print 2019
 praxis::expected<Eigen::VectorXd, praxis::refusal> newton_raphson(const praxis::optimization::problem &p, const Eigen::VectorXd &x0, std::uint32_t max_iterations,
                                                                   std::vector<Eigen::VectorXd> &iterates)
 {
@@ -56,7 +56,7 @@ praxis::expected<Eigen::VectorXd, praxis::refusal> newton_raphson(const praxis::
 }
 
 //TASK: T.1b
-//REFERENCE:
+//REFERENCE: thesis excerpt (Eq. 2.59)
 praxis::expected<Eigen::VectorXd, praxis::refusal> gradient_descent(const praxis::optimization::problem &p, const Eigen::VectorXd &x0, double step_length,
                                                                     std::uint32_t max_iterations, std::vector<Eigen::VectorXd> &iterates)
 {
@@ -72,31 +72,22 @@ praxis::expected<Eigen::VectorXd, praxis::refusal> gradient_descent(const praxis
     Eigen::VectorXd xk = x0;
     for (std::uint32_t k = 0; k < max_iterations; ++k)
     {
-        auto e = p.error(xk);
-        if (!e)
+        auto g = p.gradient(xk);
+        if (!g)
         {
-            return praxis::unexpected(praxis::refusal(e.error()));
+            return praxis::unexpected(praxis::refusal(g.error()));
         }
 
-        auto J = p.jacobian(xk);
-        if (!J)
-        {
-            return praxis::unexpected(praxis::refusal(J.error()));
-        }
-
-        if (p.stationary(xk))
+        if (p.stationary(g.value()))
         {
             return xk;
         }
 
-        auto Je = J.value().completeOrthogonalDecomposition().pseudoInverse()*e.value();
-        xk += Je;
-
+        xk -= step_length*g.value();
         iterates.push_back(xk);
     }
 
     return praxis::unexpected(praxis::refusal::no_solution);
-    return praxis::unexpected(praxis::refusal::not_implemented);
 }
 
 }
